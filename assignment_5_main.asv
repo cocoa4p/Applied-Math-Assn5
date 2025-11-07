@@ -1,0 +1,14 @@
+function assignment_5_main
+    % Parameters
+    k = 5; % spring stiffness
+    l0 = 5; % initial length of spring (when nothing is attached)
+    PA = 1; % position of one end of spring
+    PB = 2; % position of other end of spring
+    x = 1; % x position of centroid of 
+
+    % Compute force the spring exerts at one of its ends
+    F = compute_spring_force(k,l0,PA,PB);
+
+    % Map box-frame coordinates to corresponding world-frame coordinates
+    Plist_world = compute_rbt(x,y,theta,Plist_box);
+end

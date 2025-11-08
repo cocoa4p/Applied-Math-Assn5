@@ -13,5 +13,5 @@ function F = compute_spring_force(k,l0,PA,PB)
     e_s = (PB - PA)/l;
     %Force exerted by spring at point B
     F = -k*(l-l0)*e_s;
-    F = F(:); % make a column vector (should work fine without)
+    F = F(:); % make a column vector (not 
 end

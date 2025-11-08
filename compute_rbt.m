@@ -10,9 +10,10 @@
 %Plist_world: a 2 x n matrix of points describing
 %the world-frame coordinates of the points in Plist_box
 function Plist_world = compute_rbt(x,y,theta,Plist_box)
-    Plist_world = zeros(4, 2);
+    Plist_world = zeros(size(Plist_box));
     %e_x = [cos(theta), sin(theta)];
     %e_y = [-sin(theta), cos(theta)];
     rigid_body_transformation = [cos(theta), -sin(theta); sin(theta), cos(theta)];
-    Plist_world = (rigid_body_transformation * Plist_box')' + [x y];
+    % Plist_world = (rigid_body_transformation * Plist_box')' + [x y];
+    Plist_world = rigid_body_transformation * Plist_box + [x; y];
 end

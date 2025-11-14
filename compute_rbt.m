@@ -14,6 +14,8 @@ function Plist_world = compute_rbt(x,y,theta,Plist_box)
     %e_x = [cos(theta), sin(theta)];
     %e_y = [-sin(theta), cos(theta)];
     rigid_body_transformation = [cos(theta), -sin(theta); sin(theta), cos(theta)];
+    rigid_body_transformation
+    Plist_box
     % Plist_world = (rigid_body_transformation * Plist_box')' + [x y];
     Plist_world = rigid_body_transformation * Plist_box + [x; y];
 end

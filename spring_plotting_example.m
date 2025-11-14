@@ -1,4 +1,4 @@
-function spring_plotting_example()
+function [spring_plot_struct, P1, P2] = spring_plotting_example()
     num_zigs = 5;
     w = .1;
     hold on;

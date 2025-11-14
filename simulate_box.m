@@ -47,10 +47,10 @@ function simulate_box()
 my_rate_func = @(t_in,V_in) box_rate_func(t_in,V_in,box_params);
 x0 = 0;
 y0 = 0;
-theta0 = deg2rad(35);
-vx0 = 5;
-vy0 =2;
-vtheta0 = 35;
+theta0 = .2;
+vx0 = .5;
+vy0 =.2;
+vtheta0 = .35;
 V0 = [x0;y0;theta0;vx0;vy0;vtheta0];
 % tspan = [0 100];
 tspan = [0,30];
@@ -70,9 +70,78 @@ h_ref = 0.05;
 [tlist,Vlist] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V0, h_ref, expMethod);
 
 % Spring plotting example
-[spring_plot_struct, P1, P2] = spring_plotting_example();
+% [spring_plot_struct, P1, P2] = spring_plotting_example();
+
+% num_zigs = 5;
+% w = .1;
+% hold on;
+% spring_plot_struct = initialize_spring_plot(num_zigs,w);
 
 % Update spring plot
-update_spring_plot(spring_plot_struct, P1, P2);
+% update_spring_plot(spring_plot_struct, P1, P2);
+
+num_frames = 5000;
+animate_box(tlist,Vlist,box_params,num_frames)
+
+end
+
+function animate_box(tlist,Vlist,box_params,num_frames)
+    T_total = tlist(end)-tlist(1);
+    dt = T_total/num_frames;
+
+    t = tlist(1);
+    current_frame = 1;
+
+    figure(1);
+    hold on
+    l = 20;
+    axis equal
+    axis([-l,l,-l,l]);
+    
+    
+    box_plot = plot(0,0,'k','linewidth',1.5);
+    spring_list = {};
+
+    num_springs = size(box_params.P_world,2);
+
+    num_zigs = 5;
+    w = .1;
+    
+    
+    for n = 1:num_springs
+        spring_list{n} = initialize_spring_plot(num_zigs,w);
+    end
+
+    while t<=tlist(end)
+        while tlist(current_frame)<t && current_frame < length(tlist)
+            current_frame = current_frame+1;
+        end
+    
+        V_current = Vlist(current_frame,:)';
+
+
+        x_current = V_current(1);
+        y_current = V_current(2);
+        theta_current = V_current(3);
+
+        Plist_boundary = compute_rbt(x_current,y_current,theta_current,box_params.boundary_pts);
+        P1_list = box_params.P_world;
+        P2_list = compute_rbt(x_current,y_current,theta_current,box_params.P_box);
+
+        for n = 1:num_springs
+            P1 = P1_list(:,n);
+            P2 = P2_list(:,n);
+            update_spring_plot(spring_list{n},P1,P2);
+        end
+
+        set(box_plot,'xdata',Plist_boundary(1,:),'ydata',Plist_boundary(2,:))
+        drawnow;
+
+
+
+        t = t+dt;
+    end
+    
+
 
 end

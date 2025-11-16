@@ -1,20 +1,4 @@
-function simulate_box()
-% %define system parameters (these can be changed)
-% box_params = struct();
-% box_params.m = 1;                 
-% box_params.I = 1/12*(10^2 + 1^2);  
-% box_params.g = 9.81;    
-% % spring stiffnesses
-% box_params.k_list = [10 10 20 40]; 
-% box_params.l0_list = [1.5 1.5 1.5 1.5];
-% % spring endpoints
-% box_params.P_world = [ ...
-%     -2  2  2 -2;
-%     -2 -2  2  2];
-% % box-mounted points
-% box_params.P_box = [ ...           
-%     -1  1  1 -1;
-%     -1 -1  1  1];
+function test_equilibrium_step()
 
     LW = 10; LH = 1; LG = 3;
     m = 1; Ic = (1/12)*(LH^2+LW^2);
@@ -32,7 +16,7 @@ function simulate_box()
     P_world = [Pbl1_world,Pbl2_world,Pbr1_world,Pbr2_world];
     P_box = [Pbl_box,Pbl_box,Pbr_box,Pbr_box];
 
-    %define system parameters
+
     box_params = struct();
     box_params.m = m;
     box_params.I = Ic;
@@ -45,65 +29,29 @@ function simulate_box()
 %load the system parameters into the rate function
 %via an anonymous function
 
-my_rate_func = @(t_in,V_in) box_rate_func(t_in,V_in,box_params);
+    my_rate_func = @(t_in,V_in) box_rate_func(t_in,V_in,box_params);
+    
+    % test equlibirum
+    
+    temp_function = @(V_in) my_rate_func(0,V_in);
+    
+    solver_params = struct();
+    solver_params.dxtol = 1e-10;
+    solver_params.ftol = 1e-10;
+    solver_params.max_iter = 200;
+    solver_params.dxmax = 1e8;
+    solver_params.numerical_diff = 1;
+    
+    x_guess = [.1 .5 pi/2 0 0 0];
+    
+    [x_root] = multi_newton_solver_5(temp_function,x_guess,solver_params);
+    
+    disp('x_root = ');
+    disp(x_root);
 
-% test equlibirum
-
-temp_function = @(V_in) my_rate_func(0,V_in);
-
-solver_params = struct();
-solver_params.dxtol = 1e-10;
-solver_params.ftol = 1e-10;
-solver_params.max_iter = 200;
-solver_params.dxmax = 1e8;
-solver_params.numerical_diff = 1;
-
-x_guess = [.1 .5 pi/2 0 0 0];
-
-[x_root] = multi_newton_solver_5(temp_function,x_guess,solver_params);
-
-disp('x_root = ');
-disp(x_root);
-
-x0 = 0;
-y0 = 0;
-theta0 = .2;
-vx0 = .5;
-vy0 =.2;
-vtheta0 = .35;
-V0 = [x0;y0;theta0;vx0;vy0;vtheta0];
-% tspan = [0 100];
-tspan = [0,30];
-% t_range = linspace(tspan(1),tspan(2),100);
-
-% "Original" fourth-order Runge-Kutta
-ogRunge = struct();
-ogRunge.C = [0; 1/2; 1/2; 1];
-ogRunge.B = [1/6, 1/3, 1/3, 1/6];
-ogRunge.A = [0, 0, 0, 0; 1/2, 0, 0, 0; 0, 1/2, 0, 0; 0, 0, 1, 0];
-
-expMethod = ogRunge;
-
-h_ref = 0.05;
-% [t_list, X_list, h_avg, num_evals] = explicit_RK_fixed_step_integration_global(my_rate, tspan, V0, h_ref, expMethod);
-% Run the integration
-[tlist,Vlist] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V0, h_ref, expMethod);
-
-% Spring plotting example
-% [spring_plot_struct, P1, P2] = spring_plotting_example();
-
-% num_zigs = 5;
-% w = .1;
-% hold on;
-% spring_plot_struct = initialize_spring_plot(num_zigs,w);
-
-% Update spring plot
-% update_spring_plot(spring_plot_struct, P1, P2);
-
-num_frames = 5000;
-animate_box(tlist,Vlist,box_params,num_frames);
-
+        
 end
+
 
 function animate_box(tlist,Vlist,box_params,num_frames)
     T_total = tlist(end)-tlist(1);

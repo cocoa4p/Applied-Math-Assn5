@@ -65,12 +65,12 @@ x_guess = [.1 .5 pi/2 0 0 0];
 disp('x_root = ');
 disp(x_root);
 
-x0 = 0;
-y0 = 0;
-theta0 = .2;
-vx0 = .5;
-vy0 =.2;
-vtheta0 = .35;
+x0 = .0182; %0;
+y0 = .1478; %0;
+theta0 = -0.0321;%.2;
+vx0 = 0;%.5;
+vy0 =0; %.2;
+vtheta0 = 0;%.35;
 V0 = [x0;y0;theta0;vx0;vy0;vtheta0];
 % tspan = [0 100];
 tspan = [0,30];

@@ -42,7 +42,7 @@ function test_equilibrium_step()
     solver_params.dxmax = 1e8;
     solver_params.numerical_diff = 1;
     
-    x_guess = [.1 .5 pi/2 0 0 0];
+    x_guess = [.1 -2 pi/6 0 0 0];
     
     [x_root] = multi_newton_solver_5(temp_function,x_guess,solver_params);
     

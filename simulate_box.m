@@ -44,7 +44,10 @@ function simulate_box()
     box_params.boundary_pts = boundary_pts;
 %load the system parameters into the rate function
 %via an anonymous function
+
 my_rate_func = @(t_in,V_in) box_rate_func(t_in,V_in,box_params);
+temp_fuction = @(V_in) my_rate_func(0,V_in);
+
 x0 = 0;
 y0 = 0;
 theta0 = .2;

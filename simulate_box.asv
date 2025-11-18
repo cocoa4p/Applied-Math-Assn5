@@ -75,11 +75,10 @@ vy0 =0; %.2;
 vtheta0 = 0;%.35;
 
 %small number used to scale initial perturbation
-epsilon = %your code here
-V0 = Veq + epsilon*[dx0;dy0;dtheta0;vx0;vy0;vtheta0];
+epsilon = .4;%your code here
+V0 = V_eq + epsilon*[x0;y0;theta0;vx0;vy0;vtheta0];
 
-V0 = [x0;y0;theta0;vx0;vy0;vtheta0];
-% tspan = [0 100];
+% V0 = [x0;y0;theta0;vx0;vy0;vtheta0];
 tspan = [0,5];
 % t_range = linspace(tspan(1),tspan(2),100);
 
@@ -132,6 +131,39 @@ xlabel('time'); ylabel('x'); hold off;
 % % animate_box(tlist,Vlist,box_params,num_frames);
 % figure(3);
 % animate_box(tlist_test,Vlist_test,box_params,num_frames);
+
+% MODAL ANALYSIS
+[Jacobian_box, num_evals] = approximate_jacobian(my_rate_func, V0);
+
+Q = -[vx0;vy0;vtheta0]/[x0;y0;theta0];
+[U_modes, D] = eig(Q);
+omega_n = sqrt(abs(diag(D))); % Extract natural frequencies
+
+%small number
+V0 = Veq + epsilon*[Umode;0;0;0];
+tspan = [0,5];
+
+%run the integration of nonlinear system
+for i = 1:3
+    U_mode = U_modes(:, i);
+end
+[tlist_nonlinear, Vlist_nonlinear, ~, ~] = explicit_RK_fixed_step_integration(box_wrapper_2, tspan, V0_mode, h_ref, RK4); %integrate via the RK4 method
+            Vlist_nonlinear = Vlist_nonlinear'; % transpose to account for diff output from RK4 than ode45
+
+            % Compare to linear modal decomposition
+            x_modal = Veq(1) + epsilon * U_mode(1) * cos(omega_n(mode_num) * tlist_nonlinear);
+            y_modal = Veq(2) + epsilon * U_mode(2) * cos(omega_n(mode_num) * tlist_nonlinear);
+            theta_modal = Veq(3) + epsilon * U_mode(3) * cos(omega_n(mode_num) * tlist_nonlinear);
+        
+% Predicted behavior from the modal decomposition
+x_modal = Veq(1)+epsilon*Umode(1)*cos(omega_n*tlist);
+y_modal = Veq(2)+epsilon*Umode(2)*cos(omega_n*tlist);
+theta_modal = Veq(3)+epsilon*Umode(3)*cos(omega_n*tlist);
+
+% Store modal data
+Vlist_modal = [x_modal, y_modal, theta_modal];
+% Plots comparing the predicted vibration mode to the simulated nonlinear
+% behavior
 
 end
 

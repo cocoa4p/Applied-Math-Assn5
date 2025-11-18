@@ -135,24 +135,31 @@ xlabel('time'); ylabel('x'); hold off;
 % MODAL ANALYSIS
 [Jacobian_box, num_evals] = approximate_jacobian(my_rate_func, V0);
 
-U_mode = eig(Q); %your code here
-omega_n = %your code here
+Q = -[vx0;vy0;vtheta0]/[x0;y0;theta0];
+[U_modes, D] = eig(Q);
+omega_n = sqrt(abs(diag(D))); % Extract natural frequencies
+
 %small number
-epsilon = 0.1; %your code here
 V0 = Veq + epsilon*[Umode;0;0;0];
-V0_1 = Veq + epsilon*[dx_p;dy_p;dtheta_p;vx_p;vy_p;vtheta_p];
-tspan = %your code here
+tspan = [0,5];
+
 %run the integration of nonlinear system
-% [tlist_nonlinear,Vlist_nonlinear] =...
-% your_integrator(my_rate_func,tspan,V0,...);
+for i = 1:3
+    U_mode = U_modes(:, i);
+    [t_list, V_list, ~, ~] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V0, h_ref, ogRunge); 
+    V_list = V_list'; 
+        
+    % Predicted behavior from the modal decomposition
+    x_modal = Veq(1)+epsilon*U_mode(1)*cos(omega_n(i)*tlist);
+    y_modal = Veq(2)+epsilon*U_mode(2)*cos(omega_n(i)*tlist);
+    theta_modal = Veq(3)+epsilon*Umode(3)*cos(omega_n(i)*tlist);
 
-% Predicted behavior from the modal decomposition
-x_modal = Veq(1)+epsilon*Umode(1)*cos(omega_n*tlist);
-y_modal = Veq(2)+epsilon*Umode(2)*cos(omega_n*tlist);
-theta_modal = Veq(3)+epsilon*Umode(3)*cos(omega_n*tlist);
+    % Store modal data
+    Vlist_modal = [x_modal, y_modal, theta_modal];
+    % Plots comparing the predicted vibration mode to the simulated nonlinear
+    % behavior
+end
 
-% Plots comparing the predicted vibration mode to the simulated nonlinear
-% behavior
 
 end
 

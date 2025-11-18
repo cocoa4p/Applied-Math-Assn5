@@ -6,7 +6,7 @@ function modal_analysis()
     %small number
     epsilon = 0.1; %your code here
     V0 = Veq + epsilon*[Umode;0;0;0];
-    V0_p = Veq + epsilon*[dx_p;dy_p;dtheta_p;vx_p;vy_p;vtheta_p];
+    V0_1 = Veq + epsilon*[dx_p;dy_p;dtheta_p;vx_p;vy_p;vtheta_p];
     tspan = %your code here
     %run the integration of nonlinear system
     % [tlist_nonlinear,Vlist_nonlinear] =...

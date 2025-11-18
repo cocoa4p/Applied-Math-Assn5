@@ -171,19 +171,19 @@ for i = 1:3
     figure(4);
     plot(t_list,V_list(:, 1), 'r-'); hold on
     plot(t_list, x_modal, 'b-');
-    title("Predicted vibration mode vs. simulated nonlinear behavior");
+    title("Predicted vibration mode vs. simulated nonlinear behavior (X modal)");
     legend("Predicted vibration mode", "Simulated nonlinear behavior");
 
     figure(5);
     plot(t_list,V_list(:, 1), 'r-'); hold on
     plot(t_list, y_modal, 'b-');
-    title("Predicted vibration mode vs. simulated nonlinear behavior");
+    title("Predicted vibration mode vs. simulated nonlinear behavior (Y modal)");
     legend("Predicted vibration mode", "Simulated nonlinear behavior");
-    
+
     figure(6);
     plot(t_list,V_list(:, 1), 'r-'); hold on
     plot(t_list, theta_modal, 'b-');
-    title("Predicted vibration mode vs. simulated nonlinear behavior");
+    title("Predicted vibration mode vs. simulated nonlinear behavior (Z modal)");
     legend("Predicted vibration mode", "Simulated nonlinear behavior");
 end
 

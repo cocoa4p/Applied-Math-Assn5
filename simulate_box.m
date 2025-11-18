@@ -108,12 +108,12 @@ my_linear_rate = @(t_in, V_in) J_approx * (V_in - V_eq);
 [t_linear, V_linear] = explicit_RK_fixed_step_integration_global(my_linear_rate, tspan, V0, h_ref, expMethod);
 
 % linear vs nonlinear
-figure(1); hold on;
-plot(tlist,   Vlist(:,1), 'b', 'LineWidth', 1.5);
-plot(t_linear,V_linear(:,1), 'r--', 'LineWidth', 1.5);
-legend('Nonlinear', 'Linearized');
-title('x(t): Nonlinear vs Linear');
-xlabel('time'); ylabel('x'); hold off;
+%figure(1); hold on;
+%plot(tlist,   Vlist(:,1), 'b', 'LineWidth', 1.5);
+%plot(t_linear,V_linear(:,1), 'r--', 'LineWidth', 1.5);
+%legend('Nonlinear', 'Linearized');
+%title('x(t): Nonlinear vs Linear');
+%xlabel('time'); ylabel('x'); hold off;
 
 % Spring plotting example
 % [spring_plot_struct, P1, P2] = spring_plotting_example();
@@ -132,32 +132,59 @@ xlabel('time'); ylabel('x'); hold off;
 % figure(3);
 % animate_box(tlist_test,Vlist_test,box_params,num_frames);
 
+
 % MODAL ANALYSIS
-[Jacobian_box, num_evals] = approximate_jacobian(my_rate_func, V0);
+%[Jacobian_box] = approximate_jacobian(my_rate_func, V0);
 
 Q = -[vx0;vy0;vtheta0]/[x0;y0;theta0];
 [U_modes, D] = eig(Q);
 omega_n = sqrt(abs(diag(D))); % Extract natural frequencies
 
-%small number
-V0 = Veq + epsilon*[Umode;0;0;0];
-tspan = [0,5];
+
 
 %run the integration of nonlinear system
 for i = 1:3
     U_mode = U_modes(:, i);
-    [t_list, V_list, ~, ~] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V0, h_ref, ogRunge); 
-    V_list = V_list'; 
+
+    %small number
+    V0 = V_eq + epsilon*[U_mode;0;0;0];
+    tspan = [0,5];
+
+    [t_list, V_list, ~, ~] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V0, h_ref, ogRunge);  
         
     % Predicted behavior from the modal decomposition
-    x_modal = Veq(1)+epsilon*U_mode(1)*cos(omega_n(i)*tlist);
-    y_modal = Veq(2)+epsilon*U_mode(2)*cos(omega_n(i)*tlist);
-    theta_modal = Veq(3)+epsilon*Umode(3)*cos(omega_n(i)*tlist);
+    x_modal = zeros(size(t_list));
+    y_modal = zeros(size(t_list));
+    theta_modal = zeros(size(t_list));
+    t_list
+    for j = 1: t_list(end)
+        x_modal(j) = V_eq(1)+epsilon*U_mode(1)*cos(omega_n(i)*t_list(j));
+        y_modal(j) = V_eq(2)+epsilon*U_mode(2)*cos(omega_n(i)*t_list(j));
+        theta_modal(j) = V_eq(3)+epsilon*U_mode(3)*cos(omega_n(i)*t_list(j));
+    end
 
     % Store modal data
     Vlist_modal = [x_modal, y_modal, theta_modal];
+
     % Plots comparing the predicted vibration mode to the simulated nonlinear
     % behavior
+    figure(4);
+    plot(t_list,V_list(:, 1), 'r-'); hold on
+    plot(t_list, x_modal, 'b-');
+    title("Predicted vibration mode vs. simulated nonlinear behavior");
+    legend("Predicted vibration mode", "Simulated nonlinear behavior");
+
+    figure(5);
+    plot(t_list,V_list(:, 1), 'r-'); hold on
+    plot(t_list, y_modal, 'b-');
+    title("Predicted vibration mode vs. simulated nonlinear behavior");
+    legend("Predicted vibration mode", "Simulated nonlinear behavior");
+    
+    figure(6);
+    plot(t_list,V_list(:, 1), 'r-'); hold on
+    plot(t_list, theta_modal, 'b-');
+    title("Predicted vibration mode vs. simulated nonlinear behavior");
+    legend("Predicted vibration mode", "Simulated nonlinear behavior");
 end
 
 

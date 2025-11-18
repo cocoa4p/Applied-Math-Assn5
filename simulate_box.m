@@ -74,9 +74,12 @@ vx0 = 0;%.5;
 vy0 =0; %.2;
 vtheta0 = 0;%.35;
 
-V0 = [x0;y0;theta0;vx0;vy0;vtheta0];
-% tspan = [0 100];
-tspan = [0,30];
+%small number used to scale initial perturbation
+epsilon = .4;%your code here
+V0 = V_eq + epsilon*[x0;y0;theta0;vx0;vy0;vtheta0];
+
+% V0 = [x0;y0;theta0;vx0;vy0;vtheta0];
+tspan = [0,5];
 % t_range = linspace(tspan(1),tspan(2),100);
 
 % "Original" fourth-order Runge-Kutta
@@ -93,6 +96,25 @@ h_ref = 0.05;
 [tlist,Vlist] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V0, h_ref, expMethod);
 [tlist_test,Vlist_test] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V_eq, h_ref, expMethod);
 
+
+% LINEARIZATION ---------
+f = @(V) box_rate_func(0, V, box_params);
+J_approx = approximate_jacobian(f, V_eq);
+
+% linear rate function
+my_linear_rate = @(t_in, V_in) J_approx * (V_in - V_eq);
+
+% linearized simulation
+[t_linear, V_linear] = explicit_RK_fixed_step_integration_global(my_linear_rate, tspan, V0, h_ref, expMethod);
+
+% linear vs nonlinear
+figure(1); hold on;
+plot(tlist,   Vlist(:,1), 'b', 'LineWidth', 1.5);
+plot(t_linear,V_linear(:,1), 'r--', 'LineWidth', 1.5);
+legend('Nonlinear', 'Linearized');
+title('x(t): Nonlinear vs Linear');
+xlabel('time'); ylabel('x'); hold off;
+
 % Spring plotting example
 % [spring_plot_struct, P1, P2] = spring_plotting_example();
 
@@ -104,11 +126,11 @@ h_ref = 0.05;
 % Update spring plot
 % update_spring_plot(spring_plot_struct, P1, P2);
 
-num_frames = 5000;
-figure(1);
-animate_box(tlist,Vlist,box_params,num_frames);
-figure(2);
-%animate_box(tlist_test,Vlist_test,box_params,num_frames);
+% num_frames = 5000;
+% figure(2);
+% % animate_box(tlist,Vlist,box_params,num_frames);
+% figure(3);
+% animate_box(tlist_test,Vlist_test,box_params,num_frames);
 
 end
 

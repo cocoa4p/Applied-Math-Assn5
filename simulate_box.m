@@ -58,19 +58,22 @@ solver_params.max_iter = 200;
 solver_params.dxmax = 1e8;
 solver_params.numerical_diff = 1;
 
-x_guess = [.1 .5 pi/2 0 0 0];
+x_guess = [.1 -2 pi/6 0 0 0];
 
 [x_root] = multi_newton_solver_5(temp_function,x_guess,solver_params);
 
 disp('x_root = ');
 disp(x_root);
 
-x0 = .0182; %0;
+V_eq = [x_root(1,1); x_root(2,1); x_root(3,1); 0; 0; 0];
+
+x0 = 2;%.0182; %0;
 y0 = .1478; %0;
 theta0 = -0.0321;%.2;
 vx0 = 0;%.5;
 vy0 =0; %.2;
 vtheta0 = 0;%.35;
+
 V0 = [x0;y0;theta0;vx0;vy0;vtheta0];
 % tspan = [0 100];
 tspan = [0,30];
@@ -88,6 +91,7 @@ h_ref = 0.05;
 % [t_list, X_list, h_avg, num_evals] = explicit_RK_fixed_step_integration_global(my_rate, tspan, V0, h_ref, expMethod);
 % Run the integration
 [tlist,Vlist] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V0, h_ref, expMethod);
+[tlist_test,Vlist_test] = explicit_RK_fixed_step_integration_global(my_rate_func, tspan, V_eq, h_ref, expMethod);
 
 % Spring plotting example
 % [spring_plot_struct, P1, P2] = spring_plotting_example();
@@ -101,7 +105,10 @@ h_ref = 0.05;
 % update_spring_plot(spring_plot_struct, P1, P2);
 
 num_frames = 5000;
+figure(1);
 animate_box(tlist,Vlist,box_params,num_frames);
+figure(2);
+%animate_box(tlist_test,Vlist_test,box_params,num_frames);
 
 end
 
